@@ -1,0 +1,25 @@
+server:
+  host: "192.168.1.200"
+  port: 6002
+
+paths:
+  file_directory: "files"
+  file_download: "files/fordown"
+  file_upload: "files/forup"
+  file_backup: "backup"
+  file_api: "api"
+  file_process: "D:\\share\\process_file"
+  file_product: "D:\\share\\product_file"
+
+files:
+  MAX_CONTENT_LENGTH: 32 * 1024 * 1024
+  
+SqlBase:
+  Username: "sa"
+  PW: "Tsmt2024"
+  IC: "bosch"
+  IP: "localhost"
+  Table: "bosch"
+Transfer:
+  datemode: "%Y-%m-%d"
+  
