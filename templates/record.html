@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TestRecord Details</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1>TestRecord Details</h1>
+
+    <h3>Station ID: {{ test_record.stationID }}</h3>
+    <p>Timestamp: {{ test_record.timestamp }}</p>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Item Name</th>
+                <th>Timestamp</th>
+                <th>Result</th>
+                <th>Lower Limit</th>
+                <th>Upper Limit</th>
+                <th>Value</th>
+                <th>Unit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in test_record.measurements %}
+            <tr>
+                <td>{{ item.ItemName }}</td>
+                <td>{{ item.timestamp }}</td>
+                <td>{{ item.result }}</td>
+                <td>{{ item.lowerLimit }}</td>
+                <td>{{ item.upperLimit }}</td>
+                <td>{{ item.value }}</td>
+                <td>{{ item.unit }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="/static/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

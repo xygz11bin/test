@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>详细信息</title>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa; /* Light background color */
+        }
+        .container {
+            background-color: #ffffff; /* White background for the form */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            padding: 30px; /* Padding inside the container */
+            margin-top: 50px; /* Space from the top */
+        }
+        h2 {
+            color: #343a40; /* Darker text color */
+            margin-bottom: 20px; /* Space below the heading */
+        }
+        .form-label {
+            font-weight: bold; /* Bold labels */
+        }
+        .form-control[readonly] {
+            background-color: #e9ecef; /* Light gray for readonly fields */
+            cursor: not-allowed; /* Show not-allowed cursor */
+        }
+        button {
+            margin-top: 20px; /* Space above the button */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>详细信息</h2>
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">工单号 (不可修改):</label>
+                <input type="text" class="form-control" value="{{ detail.WorkOrderNo }}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">SN号 (不可修改):</label>
+                <input type="text" class="form-control" value="{{ detail.ProductSN }}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">生产周 (不可修改):</label>
+                <input type="text" class="form-control" value="{{ detail.ProductWeek }}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">生产线 (不可修改):</label>
+                <input type="text" class="form-control" value="{{ detail.ProductLine }}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">产品型号 (不可修改):</label>
+                <input type="text" class="form-control" value="{{ detail.ProductModel }}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">产品编号 (不可修改):</label>
+                <input type="text" class="form-control" value="{{ detail.ProductNumber }}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">产品项 (不可修改):</label>
+                <input type="text" class="form-control" value="{{ detail.ProductItem }}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">tpCode(不可修改):</label>
+                <input type="text" class="form-control" value="{{ detail.tpCode }}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">生产计划线 (不可修改):</label>
+                <input type="text" class="form-control" value="{{ detail.ProductPlanLine }}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">计划日期 (不可修改):</label>
+                <input type="text" class="form-control" value="{{ detail.PlanDate }}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">PCBA编码 :</label>
+                <input type="text" name="BarCode" class="form-control" value="{{ detail.BarCode }}" >
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">烧录状态:</label>
+                <input type="text" name="TestValue8" class="form-control" value="{{ detail.TestValue8 }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">安规状态:</label>
+                <input type="text" name="TestValue9" class="form-control" value="{{ detail.TestValue9 }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">激光状态:</label>
+                <input type="text" name="LaserStatus" class="form-control" value="{{ detail.LaserStatus }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">激光打标时间:</label>
+                <input type="text" name="TestValue10" class="form-control" value="{{ detail.TestValue10 }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">组装状态:</label>
+                <input type="text" name="AssbStatus" class="form-control" value="{{ detail.AssbStatus }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">组装时间:</label>
+                <input type="text" name="TestValue11" class="form-control" value="{{ detail.TestValue11 }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">测试状态:</label>
+                <input type="text" name="TestStatus" class="form-control" value="{{ detail.TestStatus }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">测试时间:</label>
+                <input type="text" name="TestValue12" class="form-control" value="{{ detail.TestValue12 }}">
+            </div>
+            <button type="submit" class="btn btn-primary">保存更改</button>
+            <button type="button" id="deleteButton" class="btn btn-danger" data-serial="{{ detail.ProductSN }}">删除记录</button>
+        </form>
+    </div>
+    <script>
+        // Initialize date-time picker
+        document.querySelectorAll('.datetimepicker').forEach((el) => {
+            flatpickr(el, {
+                enableTime: true,
+                dateFormat: "Y-m-d H:i:S",
+                time_24hr: true
+            });
+        });
+
+        // Delete button functionality
+        document.getElementById('deleteButton').addEventListener('click', function() {
+            const productSN = this.getAttribute('data-serial');
+            if (confirm('确认删除此SN号的所有数据？')) {
+                fetch(`/delete_by_sn?ProductSN=${productSN}`, { method: 'DELETE' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert("删除成功！");
+                            window.location.href = "{{ url_for('index') }}";index
+                        } else {
+                            alert("删除失败：" + data.error);
+                        }
+                    })
+                    .catch(error => alert("发生错误：" + error));
+            }
+        });
+    </script>
+</body>
+</html>

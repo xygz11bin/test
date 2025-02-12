@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>SCPlan查询</title>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .form-control, .btn {
+            border-radius: 5px;
+        }
+        .table thead th {
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+        }
+        .table tbody td {
+            text-align: center;
+        }
+        #exportButton {
+            float: right;
+            margin-bottom: 10px;
+        }
+        #queryButton {
+            margin-top: 10px;
+        }
+        .alert {
+            display: none;
+        }
+        .back-button {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('home') }}" class="back-button">&larr; 返回主页</a>
+        <h2>SCPlan查询</h2>
+        
+        <!-- 输入查询条件 -->
+        <div class="mb-3">
+            <label for="workOrderNo" class="form-label">生产订单 (WorkOrderNo)</label>
+            <input type="text" id="workOrderNo" name="workOrderNo" class="form-control" placeholder="请输入生产订单号">
+        </div>
+        <div class="mb-3 row">
+            <div class="col">
+                <label for="startDate" class="form-label">开始时间 (SchedstartCN)</label>
+                <input type="date" id="startDate" name="startDate" class="form-control">
+            </div>
+            <div class="col">
+                <label for="endDate" class="form-label">结束时间 (SchedstartCN)</label>
+                <input type="date" id="endDate" name="endDate" class="form-control">
+            </div>
+        </div>
+        <button id="queryButton" class="btn btn-primary w-100">查询</button>
+        
+        <!-- 查询结果显示 -->
+        <div class="alert alert-warning mt-3" role="alert" id="noResultsAlert">
+            没有找到相关数据
+        </div>
+        
+
+        <div class="table-responsive mt-4">
+            <!-- 导入数据按钮和文件上传框 -->
+            <input type="file" id="importFile" accept=".csv" style="display: none;">
+            <button class="btn btn-success" id="importButton">导入数据</button>
+            
+            <!-- 删除选中订单按钮 -->
+            <button class="btn btn-danger" id="deleteButton">删除选中订单</button>
+            <button id="exportButton" class="btn btn-success">导出选中项</button>
+            <table class="table table-bordered mt-2" id="resultTable">
+                <thead>
+                    <tr>
+                        <th>选择</th>
+                        <th>生产订单 (WorkOrderNo)</th>
+                        <th>数量 (Quantity)</th>
+                        <th>料号 (MNR)</th>
+                        <th>计划时间 (SchedstartCN)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            $('#queryButton').click(function() {
+                const workOrderNo = $('#workOrderNo').val();
+                const startDate = $('#startDate').val();
+                const endDate = $('#endDate').val();
+
+                if (!workOrderNo && (!startDate || !endDate)) {
+                    alert("请输入生产订单或选择时间段");
+                    return;
+                }
+
+                const params = {};
+                if (workOrderNo) params.WorkOrderNo = workOrderNo;
+                if (startDate && endDate) {
+                    params.StartDate = startDate;
+                    params.EndDate = endDate;
+                }
+
+                $.ajax({
+                    url: '/query_scplan',
+                    type: 'GET',
+                    data: params,
+                    success: function(data) {
+                        const tbody = $('#resultTable tbody');
+                        tbody.empty();
+                        $('#noResultsAlert').hide();
+
+                        if (data.length === 0) {
+                            $('#noResultsAlert').show();
+                        } else {
+                            data.forEach(function(row) {
+                                const tr = $('<tr></tr>');
+                                tr.append(`<td><input type="checkbox" class="selectWorkOrder" value="${row.WorkOrderNo}"></td>`);
+                                tr.append(`<td>${row.WorkOrderNo}</td>`);
+                                tr.append(`<td>${row.EntryCount}</td>`);
+                                tr.append(`<td>${row.MNR}</td>`);
+                                tr.append(`<td>${row.SchedstartCN}</td>`);
+                                tbody.append(tr);
+                            });
+                        }
+                    },
+                    error: function(error) {
+                        alert("查询失败，请检查输入并重试");
+                        console.log(error);
+                    }
+                });
+            });
+            $('#importButton').click(function() {
+            $('#importFile').click();
+        });
+
+            // 监听文件上传并发送至后端
+            $('#importFile').change(function() {
+                const file = this.files[0];
+                if (file) {
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    $.ajax({
+                        url: '/import_scplan',
+                        method: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            alert(response.message);
+                        },
+                        error: function() {
+                            alert("导入失败，请检查文件格式和数据内容。");
+                        }
+                    });
+                }
+            });
+
+            // 删除选中订单按钮点击事件
+            $('#deleteButton').click(function() {
+                const selectedWorkOrders = [];
+                $('.selectWorkOrder:checked').each(function() {
+                    selectedWorkOrders.push($(this).val());
+                });
+
+                if (selectedWorkOrders.length === 0) {
+                    alert("请选择至少一个订单进行删除");
+                    return;
+                }
+
+                $.ajax({
+                    url: '/delete_scplan',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ workOrderNos: selectedWorkOrders }),
+                    success: function(response) {
+                        alert(response.message);
+                        location.reload(); // 刷新页面
+                    },
+                    error: function() {
+                        alert("删除失败");
+                    }
+                });
+            });
+            $('#exportButton').click(function() {
+                const selectedWorkOrders = [];
+                $('.selectWorkOrder:checked').each(function() {
+                    selectedWorkOrders.push($(this).val());
+                });
+
+                if (selectedWorkOrders.length === 0) {
+                    alert("请选择至少一个生产订单进行导出");
+                    return;
+                }
+
+                // 将选中的订单号列表转换为字符串，并作为参数传递给后端
+                const workOrderParam = selectedWorkOrders.join(",");
+                window.location.href = `/export_scplan_details?WorkOrderNo=${workOrderParam}`;
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>查询页面</title>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        h2 {
+            color: #343a40;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .form-label {
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .table {
+            margin-top: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+        .table th {
+            background-color: #007bff;
+            color: white;
+        }
+        .table td a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .table td a:hover {
+            text-decoration: underline;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group-text {
+            background-color: #e9ecef;
+        }
+        .back-button {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <a href="{{ url_for('home') }}" class="back-button">&larr; 返回主页</a>
+        <h2>请输入查询信息</h2>
+        <form action="{{ url_for('index') }}" method="GET">
+            <div class="row mb-3">
+                <div class="col">
+                    <div class="input-group">
+                        <span class="input-group-text">SN号</span>
+                        <input type="text" id="part_number" name="part_number" class="form-control" value="{{ request.args.get('part_number', '') }}">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="input-group">
+                        <span class="input-group-text">MNR号</span>
+                        <input type="text" id="serial_number" name="serial_number" class="form-control" value="{{ request.args.get('serial_number', '') }}">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="input-group">
+                        <span class="input-group-text">生产编号</span>
+                        <input type="text" id="production_number" name="production_number" class="form-control" value="{{ request.args.get('production_number', '') }}">
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <div class="input-group">
+                        <span class="input-group-text">激光状态</span>
+                        <select id="laser_status" name="laser_status" class="form-select">
+                            <option value="">请选择</option>
+                            <option value="finished" {% if request.args.get('laser_status') == 'finished' %}selected{% endif %}>finished</option>
+                            <option value="none" {% if request.args.get('laser_status') == 'none' %}selected{% endif %}>none</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="input-group">
+                        <span class="input-group-text">组装状态</span>
+                        <select id="assb_status" name="assb_status" class="form-select">
+                            <option value="">请选择</option>
+                            <option value="finished" {% if request.args.get('assb_status') == 'finished' %}selected{% endif %}>finished</option>
+                            <option value="none" {% if request.args.get('assb_status') == 'none' %}selected{% endif %}>none</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="input-group">
+                        <span class="input-group-text">测试状态</span>
+                        <select id="test_status" name="test_status" class="form-select">
+                            <option value="">请选择</option>
+                            <option value="finished" {% if request.args.get('test_status') == 'finished' %}selected{% endif %}>finished</option>
+                            <option value="none" {% if request.args.get('test_status') == 'none' %}selected{% endif %}>none</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-4">
+                    <div class="input-group">
+                        <span class="input-group-text">时间</span>
+                        <input type="date" id="timestamp" name="timestamp" class="form-control" value="{{ request.args.get('timestamp', '') }}">
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">查询</button>
+        </form>
+        {% if result_count %}
+        <h2 class="mt-5">查询结果</h2>
+        <p class="text-center">共有 <strong>{{ result_count }}</strong> 条结果。</p>
+        <!-- 如果有查询结果，显示导出按钮 -->
+        <form action="{{ url_for('export') }}" method="POST">
+            <!-- 隐藏的字段传递查询参数到后端 -->
+            <input type="hidden" name="part_number" value="{{ request.args.get('part_number', '') }}">
+            <input type="hidden" name="serial_number" value="{{ request.args.get('serial_number', '') }}">
+            <input type="hidden" name="production_number" value="{{ request.args.get('production_number', '') }}">
+            <input type="hidden" name="timestamp" value="{{ request.args.get('timestamp', '') }}">
+            <input type="hidden" name="laser_status" value="{{ request.args.get('laser_status', '') }}">
+            <input type="hidden" name="assb_status" value="{{ request.args.get('assb_status', '') }}">
+            <input type="hidden" name="test_status" value="{{ request.args.get('test_status', '') }}">
+            <button type="submit" class="btn btn-success">导出到 CSV</button>
+        </form>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>SN号</th>
+                    <th>生产周</th>
+                    <th>产品型号</th>
+                    <th>生产时间</th>
+                    <th>订单号</th>
+                    <th>激光状态</th>
+                    <th>组装状态</th>
+                    <th>测试状态</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in results %}
+                <tr>
+                    <td><a href="{{ url_for('detail', sn=row.ProductSN) }}">{{ row.ProductSN }}</a></td>
+                    <td>{{ row.ProductWeek }}</td>
+                    <td>{{ row.ProductNumber }}</td>
+                    <td>{{ row.PlanDate }}</td>
+                    <td>{{ row.WorkOrderNo }}</td>
+                    <td>{{ row.LaserStatus }}</td>
+                    <td>{{ row.AssbStatus }}</td>
+                    <td>{{ row.TestStatus }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+</body>
+</html>

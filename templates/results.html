@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>查询结果</title>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>查询结果</h2>
+        {% if results %}
+        <table class="table table-bordered" id="resultsTable">
+            <thead>
+                <tr>
+                    <th>SN号</th>
+                    <th>生产周</th>
+                    <th>生产型号</th>
+                    <th>型号</th>
+                    <th>料号</th>
+                    <th>产品项</th>
+                    <th>T码</th>
+                    <th>PCBA码</th>
+                    <th>生产线</th>
+                    <th>生产编号</th>
+                    <th>生产时间</th>
+                    <th>激光打标</th>
+                    <th>装配</th>
+                    <th>测试</th>
+                    <th>简称</th>
+                    <th>烧录</th>
+                    <th>条形码</th>
+                </tr>
+                <tr>
+                    <!-- 为每一列添加一个筛选输入框 -->
+                    <th><input type="text" class="form-control" placeholder="筛选 SN号"></th>
+                    <th><input type="text" class="form-control" placeholder="筛选 生产周"></th>
+                    <th><input type="text" class="form-control" placeholder="筛选 生产型号"></th>
+                    <th><input type="text" class="form-control" placeholder="筛选 型号"></th>
+                    <th><input type="text" class="form-control" placeholder="筛选 料号"></th>
+                    <th><input type="text" class="form-control" placeholder="筛选 产品项"></th>
+                    <th><input type="text" class="form-control" placeholder="筛选 T码"></th>
+                    <th><input type="text" class="form-control" placeholder="筛选 PCBA码"></th>
+                    <th><input type="text" class="form-control" placeholder="筛选 生产线"></th>
+                    <th><input type="text" class="form-control" placeholder="筛选 生产编号"></th>
+                    <th><input type="text" class="form-control" placeholder="筛选 生产时间"></th>
+                    <th><input type="text" class="form-control" placeholder="筛选 激光打标"></th>
+                    <th><input type="text" class="form-control" placeholder="筛选 装配"></th>
+                    <th><input type="text" class="form-control" placeholder="筛选 测试"></th>
+                    <th><input type="text" class="form-control" placeholder="筛选 简称"></th>
+                    <th><input type="text" class="form-control" placeholder="筛选 烧录"></th>
+                    <th><input type="text" class="form-control" placeholder="筛选 条形码"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in results %}
+                <tr>
+                    {% for item in row %}
+                    <td>{{ item }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>未找到结果</p>
+        {% endif %}
+    </div>
+
+    <script>
+        document.querySelectorAll('#resultsTable thead input').forEach(function(input, index) {
+            input.addEventListener('keyup', function() {
+                var filter = input.value.toLowerCase();
+                var rows = document.querySelectorAll('#resultsTable tbody tr');
+                rows.forEach(function(row) {
+                    var cell = row.querySelectorAll('td')[index];
+                    if (cell) {
+                        var cellText = cell.textContent.toLowerCase();
+                        row.style.display = cellText.includes(filter) ? '' : 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

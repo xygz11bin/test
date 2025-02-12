@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件管理</title>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <style>
+        .custom-label {
+            margin-bottom: 0;
+            align-self: center;
+        }
+        .file-input {
+            width: 300px; /* 设置文件输入框的固定宽度 */
+        }
+        .back-button {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <a href="{{ url_for('home') }}" class="back-button">&larr; 返回主页</a>
+        <h2>工艺文件管理</h2>
+
+        <!-- 上传文件表单，调整文件输入框的宽度 -->
+        <form method="POST" enctype="multipart/form-data" class="d-flex align-items-center mb-3">
+            <label for="process_file" class="form-label custom-label me-2">上传工艺文件:</label>
+            <input type="file" id="process_file" name="process_file" class="form-control file-input me-2">
+            <button type="submit" class="btn btn-success">上传</button>
+        </form>
+
+        <!-- 文件列表 -->
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>文件名</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for file in process_files %}
+                <tr>
+                    <td>{{ file }}</td>
+                    <td>
+                        <a href="{{ url_for('download_file', folder='process_files', filename=file) }}" class="btn btn-primary me-2">下载</a>
+                        <form method="POST" style="display:inline;">
+                            <input type="hidden" name="delete_file" value="{{ file }}">
+                            <button type="submit" class="btn btn-danger">删除</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>其他文件管理</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>文件名</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for file in other_files %}
+                <tr>
+                    <td>{{ file }}</td>
+                    <td>
+                        <a href="{{ url_for('download_file', folder='other_files', filename=file) }}" class="btn btn-primary me-2">下载</a>
+                        <form method="POST" style="display:inline;">
+                            <input type="hidden" name="delete_file" value="{{ file }}">
+                            <button type="submit" class="btn btn-danger">删除</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

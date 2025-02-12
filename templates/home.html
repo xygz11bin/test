@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页</title>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        h1 {
+            color: #343a40;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .card {
+            margin: 15px 0;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+            cursor: pointer;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+        }
+        .card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+        .card-body {
+            text-align: center;
+            padding: 20px 30px;
+        }
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: #495057;
+            margin-top: 10px;
+        }
+        .card-icon {
+            font-size: 3rem;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>CtrlX IO PMS</h1>
+        
+        <div class="row">
+            <div class="col-md-6 col-lg-4">
+                <a href="{{ url_for('scplanquery') }}" class="card">
+                    <div class="card-body">
+                        
+                        <img src="{{ url_for('static', filename='image/订单管理.png') }}" alt="订单查询图标" class="img-fluid mb-3" style="width: 50px;">
+                        
+                        <h5 class="card-title">订单查询</h5>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <a href="{{ url_for('index') }}" class="card">
+                    <div class="card-body">
+                        <img src="{{ url_for('static', filename='image/生产记录.png') }}" alt="生产记录图标" class="img-fluid mb-3" style="width: 50px;">
+                        <h5 class="card-title">生产记录</h5>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <a href="{{ url_for('manage_files') }}" class="card">
+                    <div class="card-body">
+                        <img src="{{ url_for('static', filename='image/文件管理.png') }}" alt="文件管理图标" class="img-fluid mb-3" style="width: 50px;">
+                        <h5 class="card-title">工艺文件</h5>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <a href="{{ url_for('query') }}" class="card">
+                    <div class="card-body">
+                        <img src="{{ url_for('static', filename='image/数据记录.png') }}" alt="数据记录图标" class="img-fluid mb-3" style="width: 50px;">
+                        <h5 class="card-title">测试结果</h5>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <a href="{{ url_for('Hipotquery') }}" class="card">
+                    <div class="card-body">
+                        <img src="{{ url_for('static', filename='image/数据记录1.png') }}" alt="数据记录1图标" class="img-fluid mb-3" style="width: 50px;">
+                        <h5 class="card-title">安规测试结果</h5>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <link href="{{ url_for('static', filename='css/bootstrap-icons.min.css') }}" rel="stylesheet">
+</body>
+</html>
+
